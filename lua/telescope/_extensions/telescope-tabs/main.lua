@@ -96,8 +96,8 @@ M.list_tabs = function(opts)
     local window_ids = {}
     local is_current = current_tab.number == vim.api.nvim_tabpage_get_number(tid)
 
-    local focused_win = vim.fn.tabpagewinnr(tid)
-    -- local tab_focused_bfnr = vim.fn.winbufnr(focused_win)
+    local focused_win = vim.fn.tabpagewinnr(index)
+    
     local in_condition_index = 1
     for _, wid in ipairs(vim.api.nvim_tabpage_list_wins(tid)) do
       -- Only consider the normal windows and ignore the floating windows
