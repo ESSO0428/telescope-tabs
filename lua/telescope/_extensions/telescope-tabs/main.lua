@@ -164,10 +164,14 @@ M.list_tabs = function(opts)
             vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, content)
 
             local filetype = vim.api.nvim_buf_get_option(entry.bufnr, 'filetype')
-            vim.api.nvim_buf_set_option(self.state.bufnr, 'filetype', filetype)
+            pcall(function()
+              vim.api.nvim_buf_set_option(self.state.bufnr, 'filetype', filetype)
+            end
 
-            vim.api.nvim_command('setlocal foldmethod=expr')
-            vim.api.nvim_command('setlocal foldexpr=nvim_treesitter#foldexpr()')
+            pcall(function()
+              vim.api.nvim_command('setlocal foldmethod=expr')
+              vim.api.nvim_command('setlocal foldexpr=nvim_treesitter#foldexpr()')
+            end
           end,
         }),
         on_complete = {
