@@ -39,7 +39,7 @@ Install with your favorite Neovim package manager.
 Example with lazy.nvim:
 ```lua
 {
-	'LukasPietzschmann/telescope-tabs',
+	'ESSO0428/telescope-tabs',
 	config = function()
 		require('telescope').load_extension 'telescope-tabs'
 		require('telescope-tabs').setup {
@@ -53,7 +53,7 @@ Example with lazy.nvim:
 Example with packer.nvim:
 ```lua
 use {
-	'LukasPietzschmann/telescope-tabs',
+	'ESSO0428/telescope-tabs',
 	requires = { 'nvim-telescope/telescope.nvim' },
 	config = function()
 		require'telescope-tabs'.setup{
@@ -100,4 +100,4 @@ close_tab_shortcut_n = 'D',     -- if you're in normal mode
 Note, that their value do not get parsed or checked, so they should follow the regular format for keybindings.
 
 ## Documentation
-See [telescope-tabs.txt](https://github.com/LukasPietzschmann/telescope-tabs/blob/master/doc/telescope-tabs.txt).
+See [telescope-tabs.txt](https://github.com/ESSO0428/telescope-tabs/blob/master/doc/telescope-tabs.txt).
