@@ -1,3 +1,5 @@
+local ns_previewer = vim.api.nvim_create_namespace "telescope.previewers"
+
 local is_empty_table = function(t)
   if t == nil then
     return true
@@ -94,10 +96,11 @@ M.list_tabs = function(opts)
     local file_paths = {}
     local file_ids = {}
     local window_ids = {}
+    local lnums = {}
     local is_current = current_tab.number == vim.api.nvim_tabpage_get_number(tid)
 
     local focused_win = vim.fn.tabpagewinnr(index)
-    
+
     local in_condition_index = 1
     for _, wid in ipairs(vim.api.nvim_tabpage_list_wins(tid)) do
       -- Only consider the normal windows and ignore the floating windows
@@ -105,6 +108,7 @@ M.list_tabs = function(opts)
         local bid = vim.api.nvim_win_get_buf(wid)
         if in_condition_index == focused_win then
           tab_focused_bfnr = bid
+          tab_focused_bflnum = vim.api.nvim_win_get_cursor(wid)[1]
         end
         local path = vim.api.nvim_buf_get_name(bid)
         local file_name = vim.fn.fnamemodify(path, ':t')
@@ -119,7 +123,8 @@ M.list_tabs = function(opts)
     if is_current then
       current_tab.index = index
     end
-    table.insert(res, { file_names, file_paths, file_ids, window_ids, tid, is_current, tab_focused_bfnr })
+    table.insert(res,
+      { file_names, file_paths, file_ids, window_ids, tid, is_current, tab_focused_bfnr, tab_focused_bflnum })
   end
   pickers
       .new(opts, {
@@ -127,6 +132,7 @@ M.list_tabs = function(opts)
         finder = finders.new_table {
           results = res,
           entry_maker = function(entry)
+            print(vim.inspect(entry))
             local entry_string = opts.entry_formatter(entry[5], entry[3], entry[1], entry[2], entry[6])
             local ordinal_string = opts.entry_ordinal(entry[5], entry[3], entry[1], entry[2], entry[6])
             return {
@@ -134,7 +140,8 @@ M.list_tabs = function(opts)
               path = entry[2][1],
               display = entry_string,
               ordinal = ordinal_string,
-              bufnr = entry[7]
+              bufnr = entry[7],
+              lnum = entry[8]
             }
           end,
         },
@@ -158,19 +165,33 @@ M.list_tabs = function(opts)
               return
             end
 
+            local jump_to_line = function(self, bufnr, lnum)
+              pcall(vim.api.nvim_buf_clear_namespace, bufnr, ns_previewer, 0, -1)
+              if lnum and lnum > 0 then
+                pcall(vim.api.nvim_buf_add_highlight, bufnr, ns_previewer, "TelescopePreviewLine", lnum - 1, 0, -1)
+                pcall(vim.api.nvim_win_set_cursor, self.state.winid, { lnum, 0 })
+                vim.api.nvim_buf_call(bufnr, function()
+                  vim.cmd "norm! zz"
+                end)
+              end
+            end
+
             vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, {})
 
             local content = vim.api.nvim_buf_get_lines(entry.bufnr, 0, -1, false)
             vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, content)
 
-            local filetype = vim.api.nvim_buf_get_option(entry.bufnr, 'filetype')
+            local filetype = vim.api.nvim_get_option_value("filetype", { buf = entry.bufnr })
             pcall(function()
-              vim.api.nvim_buf_set_option(self.state.bufnr, 'filetype', filetype)
+              vim.api.nvim_set_option_value('filetype', filetype, { buf = self.state.bufnr }) -- Hide line numbers
             end)
 
             pcall(function()
               vim.api.nvim_command('setlocal foldmethod=expr')
               vim.api.nvim_command('setlocal foldexpr=nvim_treesitter#foldexpr()')
+              vim.schedule(function()
+                jump_to_line(self, self.state.bufnr, entry.lnum)
+              end)
             end)
           end,
         }),
