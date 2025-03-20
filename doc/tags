@@ -1,6 +1,0 @@
-configuration	telescope-tabs.txt	/*configuration*
-go_to_previous	telescope-tabs.txt	/*go_to_previous*
-list_tabs	telescope-tabs.txt	/*list_tabs*
-telescope-tabs	telescope-tabs.txt	/*telescope-tabs*
-telescope-tabs-api	telescope-tabs.txt	/*telescope-tabs-api*
-telescope-tabs-usage	telescope-tabs.txt	/*telescope-tabs-usage*
