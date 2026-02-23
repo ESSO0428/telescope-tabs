@@ -132,7 +132,6 @@ M.list_tabs = function(opts)
         finder = finders.new_table {
           results = res,
           entry_maker = function(entry)
-            print(vim.inspect(entry))
             local entry_string = opts.entry_formatter(entry[5], entry[3], entry[1], entry[2], entry[6])
             local ordinal_string = opts.entry_ordinal(entry[5], entry[3], entry[1], entry[2], entry[6])
             return {
